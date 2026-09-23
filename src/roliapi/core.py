@@ -3,7 +3,7 @@ import requests
 import cloudscraper
 from bs4 import BeautifulSoup
 
-class roliapi:
+class RolimonData:
     def __init__(self, item_details: dict = None):
         if item_details == None:
             self.update_data()

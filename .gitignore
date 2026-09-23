@@ -8,5 +8,11 @@ __pycache__/
 *.pyo
 *.pyd
 
+# egg
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
 # env
 .env
