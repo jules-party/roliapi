@@ -1,5 +1,4 @@
 import json
-import requests
 import cloudscraper
 from bs4 import BeautifulSoup
 
@@ -29,26 +28,42 @@ class Item:
         self.best_price = best_price # requires webscraping
         self.picture = picture # dunno yet
 
-    def get_best_price(self):
-        BASE_URL = "https://rolimons.com/item/"
+    def get_best_price(self, roblo_security):
+        BASE_URL = f"https://catalog.roblox.com/v1/catalog/items/{self.id}/details"
 
         scraper = cloudscraper.create_scraper()
-        url = BASE_URL + str(self.id)
-        response = scraper.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        scraper.cookies[".ROBLOSECURITY"] = roblo_security
 
-        best_price = soup.select_one("div.d-flex.value-stat-box.bg-primary > div:not([class]) .value-stat-data")
-        self.best_price = int(best_price.text.replace(',', ''))
+        response = scraper.get(BASE_URL, params={"itemType": "Asset"})
+        response.raise_for_status()
+        data = response.json()
 
-    def get_item_picture(self):
-        BASE_URL = "https://rolimons.com/item/"
+        lowest = data.get("lowestResalePrice")
+        return lowest
+
+    def get_item_picture(self, roblo_security):
+        BASE_URL = "https://thumbnails.roblox.com/v1/assets"
 
         scraper = cloudscraper.create_scraper()
-        url = BASE_URL + str(self.id)
-        response = scraper.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        scraper.cookies[".ROBLOSECURITY"] = roblo_security
 
-        img = soup.find('img', class_=['img-responsive', 'img-fluid', 'rounded', 'm-3', 'shadow-sm'])
-        img_src = img.get('src')
-        self.picture = img_src
+        response = scraper.get(BASE_URL, params={
+            "assetIds": self.id,
+            "size": "420x420",
+            "format": "Png",
+            "isCircular": "false"
+        })
 
+        response.raise_for_status()
+        data = response.json()
+
+        entries = data.get("data", [])
+        if not entries:
+            return None
+
+        entry = entries[0]
+        if entry.get("state") != "Completed":
+            return None
+
+        picture = entry.get("imageUrl")
+        return picture
