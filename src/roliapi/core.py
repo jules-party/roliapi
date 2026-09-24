@@ -1,6 +1,5 @@
 import json
 import cloudscraper
-from bs4 import BeautifulSoup
 
 class RolimonData:
     def __init__(self, item_details: dict = None):
@@ -8,15 +7,16 @@ class RolimonData:
             self.update_data()
     
     def get_item_data(self, item_id: int):
-        item_obj = self.item_details["items"][str(item_id)]
+        item_dict = self.item_details.get("items", {})
+        item_obj = item_dict.get(str(item_id))
         
         return Item(item_id, item_obj[0], item_obj[1], item_obj[2], item_obj[3], item_obj[4])
 
     def update_data(self):
         scraper = cloudscraper.create_scraper()
         self.item_details = scraper.get("https://rolimons.com/itemapi/itemdetails").json()
-        if not self.item_details["success"]:
-            pass # Add proper error handling       
+        if not self.item_details.get("success"):
+            raise NotImplementedError # Add proper error handling       
 class Item:
     def __init__(self, id, name, acronym, rap, value, default_value, best_price = None, picture = None):
         self.id = id # key

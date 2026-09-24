@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "roliapi"
 version = "0.1.0"
 dependencies = [
-  "beautifulsoup4 >= 4.15.0",
   "cloudscraper >= 1.2.71",
   "Requests >= 2.34.2"
 ]
