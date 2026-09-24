@@ -25,8 +25,6 @@ class Item:
         self.rap = rap # index 2
         self.value = value # index 3
         self.default_value = default_value # index 4
-        self.best_price = best_price # requires webscraping
-        self.picture = picture # dunno yet
 
     def get_best_price(self, roblo_security):
         BASE_URL = f"https://catalog.roblox.com/v1/catalog/items/{self.id}/details"
