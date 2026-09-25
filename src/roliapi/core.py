@@ -1,6 +1,5 @@
 import cloudscraper
-import os
-import json
+
 
 class Item:
     def __init__(self, id, name, acronym, rap, value, default_value, best_price = None, picture = None):
@@ -72,8 +71,6 @@ class RolimonData:
         details = response.json()
 
         name = details.get("name")
-        with open("dump.json", "w", encoding="utf-8") as file:
-            json.dump(details, file, indent=4)
 
         collectible_id = details.get("collectibleItemId")
         rap = None
