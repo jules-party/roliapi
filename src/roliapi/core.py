@@ -1,5 +1,6 @@
 import cloudscraper
-
+import os
+import json
 
 class Item:
     def __init__(self, id, name, acronym, rap, value, default_value, best_price = None, picture = None):
@@ -56,16 +57,46 @@ class RolimonData:
     def __init__(self, item_details: dict | None = None):
         if item_details == None:
             self.update_data()
-    
-    def get_item_data(self, item_id: int) -> Item:
+
+    # Rolimon has missing data for newer-ish items, so just fallback to Roblox API for general info
+    # Though we miss out on item value (even if its on the Rolimon website)
+    # We could scrape the item's page for Value using BS4, but I'd rather stray away from WebScraping
+    def _roblox_fallback(self, item_id: int, roblo_security: str) -> Item:
+        BASE_URL = f"https://catalog.roblox.com/v1/catalog/items/{item_id}/details"
+
+        scraper = cloudscraper.create_scraper()
+        scraper.cookies[".ROBLOSECURITY"] = roblo_security
+
+        response = scraper.get(BASE_URL, params={"itemType": "Asset"})
+        response.raise_for_status()
+        details = response.json()
+
+        name = details.get("name")
+        with open("dump.json", "w", encoding="utf-8") as file:
+            json.dump(details, file, indent=4)
+
+        collectible_id = details.get("collectibleItemId")
+        rap = None
+        if collectible_id:
+            rap_url = f"https://apis.roblox.com/marketplace-sales/v1/item/{collectible_id}/resale-data"
+            rap_res = scraper.get(rap_url)
+            if rap_res.status_code == 200:
+                rap = rap_res.json().get("recentAveragePrice")
+                rap = int(rap)
+
+        item = Item(item_id, name, None, rap if rap is not None else -1, -1, -1)
+        return item
+
+    def get_item_data(self, item_id: int, roblo_security: str = None) -> Item:
         item_dict = self.item_details.get("items", {})
-
-        if not item_dict.get(str(item_id)):
-            return None
-
         item_obj = item_dict.get(str(item_id))
+
+        if not item_obj:
+            item = self._roblox_fallback(item_id, roblo_security)
+            return item
         
         return Item(item_id, item_obj[0], item_obj[1], item_obj[2], item_obj[3], item_obj[4])
+
 
     def get_all_items(self) -> list[Item]:
         items_raw = self.item_details.get("items")
