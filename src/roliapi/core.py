@@ -40,7 +40,7 @@ class RolimonData:
         assets_url = f"https://api.rolimons.com/players/v1/playerassets/{player_id}"
 
         scraper = cloudscraper.create_scraper()
-        info_res = scraper.get(info_res)
+        info_res = scraper.get(info_url)
         assets_res = scraper.get(assets_url)
 
         player_info = info_res.json()
