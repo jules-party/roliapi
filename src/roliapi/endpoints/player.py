@@ -9,7 +9,7 @@ class Player:
         self.rap: int = data.get("rap")
         self.premium: bool = data.get("premium")
         self.inventory: dict = data.get("inventory")
-        self.item_holds: list[int] = data.get("holds")
+        self.holds: list[int] = data.get("holds")
         self.avatar_url: str = data.get("avatar_url")
 
     def get_player_avatar(self):
