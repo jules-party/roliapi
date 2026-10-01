@@ -1,7 +1,7 @@
 import requests
 
-from endpoints.items import Item
-from endpoints.player import Player
+from .endpoints.items import Item
+from .endpoints.player import Player
 
 class RolimonData:
     def __init__(self, item_details: dict = None):
