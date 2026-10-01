@@ -1,7 +1,7 @@
-import cloudscraper
+import requests
 
-from .endpoints.items import Item
-from .endpoints.player import Player
+from endpoints.items import Item
+from endpoints.player import Player
 
 class RolimonData:
     def __init__(self, item_details: dict = None):
@@ -9,8 +9,8 @@ class RolimonData:
             self.update_data()
 
     def update_data(self) -> None:
-        scraper = cloudscraper.create_scraper()
-        self.item_details = scraper.get("https://api.rolimons.com/items/v3/itemdetails").json()
+        session = requests.Session()
+        self.item_details = session.get("https://api.rolimons.com/items/v3/itemdetails").json()
         if not self.item_details.get("success"):
             raise NotImplementedError # Add proper error handling
 
@@ -39,9 +39,9 @@ class RolimonData:
         info_url = f"https://api.rolimons.com/players/v1/playerinfo/{player_id}"
         assets_url = f"https://api.rolimons.com/players/v1/playerassets/{player_id}"
 
-        scraper = cloudscraper.create_scraper()
-        info_res = scraper.get(info_url)
-        assets_res = scraper.get(assets_url)
+        session = requests.Session()
+        info_res = session.get(info_url)
+        assets_res = session.get(assets_url)
 
         player_info = info_res.json()
         player_assets = assets_res.json()

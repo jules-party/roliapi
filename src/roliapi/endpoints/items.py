@@ -1,4 +1,4 @@
-import cloudscraper
+import requests
 
 class Item:
     def __init__(self, data: dict = {}):
@@ -14,10 +14,10 @@ class Item:
     def get_best_price(self, roblo_security) -> int:
         BASE_URL = f"https://catalog.roblox.com/v1/catalog/items/{self.id}/details"
 
-        scraper = cloudscraper.create_scraper()
-        scraper.cookies[".ROBLOSECURITY"] = roblo_security
+        session = requests.Session()
+        session.cookies[".ROBLOSECURITY"] = roblo_security
 
-        response = scraper.get(BASE_URL, params={"itemType": "Asset"})
+        response = session.get(BASE_URL, params={"itemType": "Asset"})
         response.raise_for_status()
         data = response.json()
 
@@ -27,10 +27,10 @@ class Item:
     def get_item_picture(self, roblo_security) -> str:
         BASE_URL = "https://thumbnails.roblox.com/v1/assets"
 
-        scraper = cloudscraper.create_scraper()
-        scraper.cookies[".ROBLOSECURITY"] = roblo_security
+        session = requests.Session()
+        session.cookies[".ROBLOSECURITY"] = roblo_security
 
-        response = scraper.get(BASE_URL, params={
+        response = session.get(BASE_URL, params={
             "assetIds": self.id,
             "size": "420x420",
             "format": "Png",

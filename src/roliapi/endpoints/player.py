@@ -1,4 +1,4 @@
-import cloudscraper
+import requests
 
 class Player:
     def __init__(self, data: dict = {}):
@@ -21,8 +21,8 @@ class Player:
             "isCircular": False
         }
 
-        scraper = cloudscraper.create_scraper()
-        res = scraper.get(url, params=params)
+        session = requests.Session()
+        res = session.get(url, params=params)
         data = res.json().get("data")
 
         image_url = data[0].get("imageUrl")
